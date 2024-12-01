@@ -1,0 +1,14 @@
+---
+- name: Actualizar paquetes e instalar Apache2 en vm1
+  hosts: vm_prueba
+  become: yes
+  tasks:
+    - name: Actualizar los paquetes
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Instalar apache2
+      apt:
+        name: apache2
+        state: present 

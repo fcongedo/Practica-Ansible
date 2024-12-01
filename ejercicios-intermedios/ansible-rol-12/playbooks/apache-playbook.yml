@@ -1,0 +1,6 @@
+---
+- name: Instalar y configurar Apache usando un rol
+  hosts: vm_prueba
+  become: yes
+  roles: 
+    - apache_role

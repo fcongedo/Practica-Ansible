@@ -1,0 +1,18 @@
+---
+- name: Configurar Apache2 y cambiar la pagia por defecto
+  hosts: local
+  become: yes
+  tasks:
+    - name: Copiar el archivo de configuracion de la pagina por defecto
+      copy:
+        content: |
+          <h1>¡Hola, mundo2!</h1>
+          <p>Esta es mi pagina de Apache2 modificada.</p>
+        dest: /var/www/html/index.html
+      notify: Reiniciar apache2 # Notificar al handler si hay cambios
+
+  handlers:
+    - name: Reiniciar apache2
+      service:
+        name: apache2
+        state: restarted

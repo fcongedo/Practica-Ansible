@@ -1,0 +1,29 @@
+---
+- name: Configurar cron job en el servidor
+  hosts: vm_prueba 
+  become: yes
+  tasks:
+    - name: Crear el directorio para scripts en el nodo remoto
+      file:
+        path: /home/feco2/scripts
+        state: directory
+        owner: feco2
+        group: feco2
+        mode: '0755'
+
+    - name: Copiar el script al nodo remoto
+      copy:
+        src: "/home/fran/practica-ansible/ejercicios-intermedios/registro_fecha.sh"
+        dest: "/home/feco2/scripts/registro_fecha.sh"
+        owner: feco2
+        group: feco2
+        mode: '0755'
+
+
+    - name: Crear un cron job para ejecutar el script a las 2:00 AM
+      cron:
+        name: "Ejecutar script diario"
+        user: feco2
+        minute: "0"
+        hour: "2"
+        job: "/home/feco2/scripts/registro_fecha.sh"   

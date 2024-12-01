@@ -1,0 +1,24 @@
+---
+- name: Verificar y gestionar el estado del servicio Apache
+  hosts: vm_prueba
+  become: true
+  tasks:
+    - name: Obtener información sobre los servicios
+      ansible.builtin.service_facts:
+
+    - name: Comprobar el estado del servicio Apache2
+      debug:
+         msg: "El servicio apache2 ya está en ejecucion."
+      when: "'apache2' in services and services['apache2'].state == 'running'"
+
+    - name: Iniciar el servicio apache2 si no esta corriendo
+      ansible.builtin.systemd:
+        name: apache2
+        state: started
+      register: apache_start
+      when: "'apache2' in services and services['apache2'].state != 'running'"
+    
+    - name: Mensaje de exito al iniciar el servicio apache2
+      debug:
+        msg: "El servicio de Apache2 ha sido iniciado con éxito."
+      when: apache_start.changed

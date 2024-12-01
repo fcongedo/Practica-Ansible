@@ -1,0 +1,6 @@
+---
+# handlers/main.yml
+- name: Reiniciar apache
+  service:
+    name: apache2
+    state: restarted

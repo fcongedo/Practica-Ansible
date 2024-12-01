@@ -1,0 +1,16 @@
+---
+- name: Backup de archivo original y modificarlo
+  hosts: vm_prueba
+  become: yes
+  tasks:
+    - name: Crear copia de seguridad del archivo
+      copy:
+        src: /home/feco2/practica-ansible/archivo-original.txt
+        dest: /home/feco2/practica-ansible/archivo-original.txt.bak
+        remote_src: yes
+
+    - name: Modificar el archivo
+      lineinfile:
+        path: /home/feco2/practica-ansible/archivo-original.txt
+        line: "hola desde ansible" 
+        state: present

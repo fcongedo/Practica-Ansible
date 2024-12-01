@@ -1,0 +1,16 @@
+--- 
+- name: Desplegar una aplicacion web simple
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Asegurarme de que apache este en ejecucion
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+    - name: Copiar la pagina HTML al servidor web
+      copy:
+        src: /home/fran/practica-ansible/ejercicios-intermedios/index.html
+        dest: /var/www/html/index.html
+
+        

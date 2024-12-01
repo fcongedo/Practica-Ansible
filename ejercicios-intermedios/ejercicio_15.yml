@@ -1,0 +1,29 @@
+---
+- name: Configurar tareas segun el sistema operativo
+  hosts: vm_prueba
+  become: yes
+  tasks:
+    - name: Instalar un paquete en Debian
+      ansible.builtin.apt:
+        name: vim
+        state: present
+        update_cache: yes
+      register: debian_install
+      when: ansible_os_family == "Debian"
+  
+    - name: Instalar un paquete en RedHat
+      ansible.builtin.yum:
+        name: vim
+        state: present
+      register: redhat_install
+      when: ansible_os_family == "RedHat"
+
+    - name: Mensaje de confirmación para Debian
+      debug:
+        msg: "El paquete vim ha sido instalado en un sistema debian"
+      when: debian_install.changed
+
+    - name: Mensaje de confirmación para RedHat
+      debug:
+        msg: "El paquete vim ha sido instalado en un sistema RedHat"
+      when: redhat_install.changed

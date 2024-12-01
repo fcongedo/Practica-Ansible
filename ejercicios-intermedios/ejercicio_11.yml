@@ -1,0 +1,43 @@
+---
+- name: Playbook para instalar Docker en servidores remotos
+  hosts: vm_prueba
+  become: yes
+  tasks:
+    - name: Actualizar el indice de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar dependencias necesarias
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Agregar la clave GPG oficial de Docker
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Agregar el repositorio de Docker
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker
+
+    - name: Actualizar el indice de paquetes despues de agregar el repositorio Docker
+      apt:
+        update_cache: yes
+
+    - name: Instalar Docker CE
+      apt:
+        name: docker-ce
+        state: latest
+
+    - name: Habilitar y iniciar Docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started

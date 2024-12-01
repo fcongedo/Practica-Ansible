@@ -1,0 +1,13 @@
+---
+- name: Instalar paquetes en los servidores
+  hosts: vm_prueba 
+  become: yes
+  tasks:
+    - name: Instalar paquetes
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - apache2
+        - git
+        - htop

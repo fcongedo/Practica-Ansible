@@ -1,0 +1,17 @@
+---
+- name: Configurar SSH con claves
+  hosts: vm_prueba 
+  become: yes
+  tasks:
+    - name: Asegurarse de que el directorio .ssh exista
+      file:
+        path: "/home/{{ ansible_user }}/.ssh"
+        state: directory
+        mode: '0700'
+      become: no
+    
+    - name: Agregar la clave publica SSH
+      authorized_key:
+        user: "{{ ansible_user }}"
+        state: present
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
