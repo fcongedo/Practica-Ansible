@@ -1,0 +1,19 @@
+---
+- name: Crear y copiar archivo localmente
+  hosts: localhost
+  tasks:
+    - name: Crear un archivo simple
+      copy:
+        content: "Este es un contenido del archivo."
+        dest: /home/fran/practica-ansible/ejercicios-inicial/prueba.txt
+    
+    - name: Crear directorio de destino si no existe
+      file:
+        path: /home/fran/practica-ansible/ejercicios-inicial/backup
+        state: directory
+
+    - name: Copiar archivo al directorio destino
+      copy:
+        src: /home/fran/practica-ansible/ejercicios-inicial/prueba.txt
+        dest: /home/fran/practica-ansible/ejercicios-inicial/backup/prueba.txt
+

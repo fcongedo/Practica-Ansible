@@ -1,0 +1,14 @@
+---
+- name: Agregar variable de entorno a .profile
+  hosts: localhost
+  tasks:
+    - name: Asegurarse de que la variable este en .profile si no la crea
+      lineinfile:
+        path: ~/.profile
+        line: 'export MY_VARIABLE="mi_valor"'
+        state: present
+
+    - name: Recargar el archivo de perfil para aplicar cambios
+      shell: source ~/.profile
+      args:
+        executable: /bin/bash

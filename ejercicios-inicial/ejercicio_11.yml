@@ -1,0 +1,21 @@
+---
+- name: Comprobar y a agregar linea en un archivo
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Asegurarse de que una linea este presente en el archivo config.txt
+      lineinfile:
+        path: /home/fran/practica-ansible/ejercicios-inicial/config.txt # archivo donde voy a comprobar la linea
+        line: "max_connections=100" # linea a comprobar 
+        state: present # Asegura que la linea esta presente
+      register: result # Almacena el resultado de la tarea
+
+    - name: Confirmar si la linea fue encontrada o agregada
+      debug:
+        msg: >
+          {%- if result.changed %}
+          La linea "max_connections=100" fue agregada al archivo.
+          {%- else %}
+          La linea "max_connections=100" ya estaba en el archivo.
+          {%- endif %}
+

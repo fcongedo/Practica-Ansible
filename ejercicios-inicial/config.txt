@@ -1,0 +1,6 @@
+# Configuracion del servidor
+host= localhost
+port=8080
+timeout=30
+timeout=50
+max_connections=100

@@ -1,0 +1,19 @@
+--- 
+- name: Configurar reglas basicas de firewall
+  hosts: localhost
+  become: yes # usar permisos de root si es necesario
+  tasks:
+    - name: Asegurarse de que utw esta instalado en la vm
+      apt:
+        name: ufw
+        state: present
+
+    - name: Habilitar ufw
+      ufw:
+        state: enabled
+
+    - name: Permitir trafico HTTP (puerto 80)
+      ufw:
+        rule: allow
+        name: 'Apache'
+

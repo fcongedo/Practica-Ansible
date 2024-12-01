@@ -1,0 +1,10 @@
+---
+- name: Install Vim on ubuntu
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install Git
+      ansible.builtin.apt:
+        name: git
+        state: present

@@ -1,0 +1,10 @@
+---
+- name: Instalar Apache2
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Instalar Apache
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes

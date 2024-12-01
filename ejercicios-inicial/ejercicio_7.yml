@@ -1,0 +1,20 @@
+---
+- name: Instalar una lista de paquetes utilizando variables
+  hosts: localhost
+  become: yes # permisos de root si es necesario
+
+  vars:
+    lista_de_paquetes:
+      - curl
+      - htop
+
+  tasks:
+    - name: Actualizar la lista de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar paquetes
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ lista_de_paquetes }}"

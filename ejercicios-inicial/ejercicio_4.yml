@@ -1,0 +1,12 @@
+---
+- name: Actualizar paquetes del sistema Ubuntu/Debian
+  hosts: all
+  become: yes # se require usar sudo
+  tasks:
+    - name: Actualizar la cache de los paquetes
+      apt:
+        update_cache: yes
+
+    - name: Actualizar todos los paquetes
+      apt:
+        upgrade: dist

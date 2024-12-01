@@ -1,0 +1,12 @@
+---
+- name: Comprobar conectividad 
+  hosts: localhost
+  tasks:
+    - name: Hacer ping a Google
+      command: ping -c 4 google.com # realizo 4 pings a google.com
+      register: resultado_ping
+      ignore_errors: yes # ignora si no se puede realizar ping
+
+    - name: Mostrar resultados del ping
+      debug:
+        var: resultado_ping.stdout_lines

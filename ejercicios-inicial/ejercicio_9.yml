@@ -1,0 +1,12 @@
+---
+- name : Eliminar archivos especificos en la maquina host
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Eliminar archivos especificos
+      file:
+        path: "{{ item }}" # Ruta del archivo a eliminar
+        state: absent
+      loop:
+        - /home/fran/practica-ansible/prueba_ejercicio9.txt
+        - /home/fran/practica-ansible/ejercicios-inicial/prueba_ejercicio9.txt

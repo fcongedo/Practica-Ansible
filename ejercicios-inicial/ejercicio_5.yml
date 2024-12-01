@@ -1,0 +1,9 @@
+---
+- name: Cambiar permisos de un archivo en local
+  hosts: localhost
+  become: yes # Permisos de root si es necesario
+  tasks:
+    - name: Cambiar permisos de un archivo
+      file:
+        path: /home/fran/practica-ansible/ejercicios-inicial/prueba.txt
+        mode: '0700' # cambia los permisos a rwx------

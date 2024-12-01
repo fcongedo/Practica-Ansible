@@ -1,0 +1,23 @@
+---
+- name: Ejecutar comandos ad-hoc en localhost
+  hosts: localhost
+  tasks:
+    - name: Comprobar el tiempo de actividad del sistema
+      command: uptime
+      register: uptime_result
+
+    - name: Mostrar el resultado de uptime
+      debug:
+        var: uptime_result.stdout
+
+    - name: comprobar el uso de disco
+      command: 
+        argv:
+          - df
+          - -h
+      register: df_result
+
+
+    - name: Mostrar el resultado de df -h
+      debug:
+        var: df_result.stdout

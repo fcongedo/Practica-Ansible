@@ -1,0 +1,26 @@
+---
+- name: Crear un nuevo grupo y un nuevo usuario
+  hosts: localhost
+  become: yes # Utiliza usuario sudo si es necesario.
+
+  vars_files:
+    - password.yml # archivo de contraseña cifrada
+  
+  vars:
+    nombre_usuario: "carlos"
+    nombre_grupo: "prueba"
+
+
+  tasks:
+    - name: Crear un nuevo grupo
+      group:
+        name: "{{ nombre_grupo }}"
+        state: present
+
+    - name: Crear un nuevo usuario y agregarlo al grupo
+      user:
+        name: "{{ nombre_usuario }}"
+        group: "{{ nombre_grupo }}" # Añadimos el usuario al grupo
+        shell: /bin/bash # Le especificamos el shell del usuario
+        password: "{{ nueva_contraseña | password_hash('sha512') }}" # Cifrar la contraseña
+        state: present

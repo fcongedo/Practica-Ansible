@@ -1,0 +1,10 @@
+---
+- name: Crear un directorio si no existe
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Crear un directorio
+      file:
+        path: /home/fran/practica-ansible/ejercicios-inicial/prueba
+        state: directory
+        mode: '0755'
