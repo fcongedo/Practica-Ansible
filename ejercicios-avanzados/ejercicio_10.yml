@@ -1,0 +1,27 @@
+---
+- name: Actualizar nodos de forma orquestada
+  hosts: vm_prueba
+  become: yes
+  serial: 1  # Esto asegura que solo un nodo se actualice a la vez
+
+  tasks:
+    - name: Actualizar los paquetes del sistema
+      ansible.builtin.package:
+        name: '*'
+        state: latest
+
+    - name: Reiniciar el servicio si se actualizó el kernel
+      ansible.builtin.shell: |
+        if uname -r | grep -q '3\.'; then
+          reboot;
+        fi
+      when: ansible_facts['pkg_mgr'] == 'apt'  # Ajusta si usas un gestor diferente
+      ignore_errors: true
+
+    - name: Verificar que la máquina está de nuevo disponible
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host }}"
+        port: 22
+        state: started
+        timeout: 300
+        delay: 10

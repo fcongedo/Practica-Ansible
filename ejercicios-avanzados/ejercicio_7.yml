@@ -1,0 +1,25 @@
+---
+- name: Ejemplo simple de tareas asíncronas
+  hosts: vm_prueba
+  become: yes
+  tasks:
+    
+    - name: Instalar Nginx (asíncrono)
+      ansible.builtin.package:
+        name: nginx
+        state: present
+      async: 60   # tiempo máximo en segundos para la tarea
+      poll: 0     # no espera a que la tarea termine, continúa con otras tareas
+      register: nginx_install_job
+
+    - name: Esperar a que la instalación de Nginx termine
+      ansible.builtin.async_status:
+        jid: "{{ nginx_install_job.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 10   # número de reintentos
+      delay: 5      # espera entre reintentos
+
+    - name: Mostrar el resultado de la instalación de Nginx
+      debug:
+        msg: "Resultado de la instalación de Nginx: {{ job_result }}"

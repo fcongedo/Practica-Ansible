@@ -1,0 +1,41 @@
+---
+- name: Desplegar una pila LAMP en vm_prueba
+  hosts: vm_prueba
+  become: yes
+  tasks:
+    
+    - name: Actualizar la lista de paquetes
+      ansible.builtin.apt:
+        update_cache: yes
+    
+    - name: Instalar Apache
+      ansible.builtin.package:
+        name: apache2
+        state: present
+    
+    - name: Instalar MySQL Server
+      ansible.builtin.package:
+        name: mysql-server
+        state: present
+    
+    - name: Instalar PHP y extensiones necesarias
+      ansible.builtin.package:
+        name:
+          - php
+          - libapache2-mod-php
+          - php-mysql
+        state: present
+
+    - name: Asegurar que Apache esté en ejecución y habilitado al inicio
+      ansible.builtin.service:
+        name: apache2
+        state: started
+        enabled: true
+
+    - name: Copiar archivo de prueba PHP a la carpeta web
+      ansible.builtin.copy:
+        src: /home/fran/practica-ansible/ejercicios-avanzados/index.php
+        dest: /var/www/html/index.php
+        owner: www-data
+        group: www-data
+        mode: '0644'

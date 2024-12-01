@@ -1,0 +1,57 @@
+--- 
+ - name: Desplegar y configurar aplicaciones basadas en Facts
+   hosts: vm_prueba
+   become: yes
+   tasks:
+
+     - name: Actualizar la lista de paquetes
+       ansible.builtin.apt:
+         update_cache: yes
+
+     - name: Mostrar información del sistema
+       debug:
+         msg: "Sistema Operativo: {{ ansible_os_family }}, Versión del kernel: {{ ansible_kernel }}"
+
+
+     - name: Verificar si el sistema es Ubuntu
+       debug:
+         msg: "El sistema es Ubuntu"
+       when: ansible_os_family== "Debian"
+
+
+     - name: Instalar Apache2 en Ubuntu
+       ansible.builtin.package:
+         name: apache2
+         state: present
+       when: ansible_os_family == "Debian"
+
+
+     - name: Instalar Nginx en sistemas diferentes a Ubuntu
+       ansible.builtin.package:
+         name: nginx
+         state: present
+       when: ansible_os_family != "Debian"
+
+     - name: Iniciar y habilitar Apache2
+       ansible.builtin.service:
+         name: apache2
+         state: started
+         enabled: true
+       when: ansible_os_family == "Debian"
+
+     - name : Iniciar y habilitar Nginx
+       ansible.builtin.service:
+         name: nginx
+         state: started
+         enabled: true
+       when: ansible_os_family != "Debian"
+
+     - name: Verificar si el sistema tiene más de 2 GB de RAM
+       debug:
+         msg: "Este sistema tiene más de 2 GB de ram."
+       when: ansible_memtotal_mb > 2048
+
+     - name: Verificar si el sistema tiene menos de 2 GB de RAM
+       debug:
+         msg: "Este sistema tiene menos de 2GB de ram."
+       when: ansible_memtotal_mb <= 2048

@@ -1,0 +1,50 @@
+---
+- name: Configurar servidor y desplegar microservicios
+  hosts: all
+  become: yes
+
+  tasks:
+    # 1. Actualizar paquetes
+    - name: Actualizar paquetes del sistema
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+
+    # 2. Instalar Docker
+    - name: Instalar Docker
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+
+    # 3. Crear directorios para la aplicación
+    - name: Crear directorios para los microservicios
+      file:
+        path: "/opt/microservices/{{ item }}"
+        state: directory
+      loop:
+        - backend
+        - frontend
+
+    # 4. Copiar archivos del proyecto
+    - name: Copiar archivos del backend
+      copy:
+        src: ../backend/
+        dest: /opt/microservices/backend/
+
+    - name: Copiar archivos del frontend
+      copy:
+        src: ../frontend/
+        dest: /opt/microservices/frontend/
+
+    - name: Copiar archivo docker-compose.yml
+      copy:
+        src: ../docker-compose.yml
+        dest: /opt/microservices/
+
+    # 5. Ejecutar docker-compose
+    - name: Iniciar microservicios con Docker Compose
+      command: docker-compose up -d
+      args:
+        chdir: /opt/microservices/

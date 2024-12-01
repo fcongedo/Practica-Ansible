@@ -1,0 +1,21 @@
+---
+- name: Desplegar y configurar apache en vm_prueba
+  hosts: vm_prueba
+  become: yes
+  tasks:
+
+    - name: Actualizar lista de paquetes
+      ansible.builtin.apt:
+        update_cache: yes
+
+
+    - name: Instalar apache
+      ansible.builtin.package:
+        name: apache2
+        state: present
+
+    - name: Iniciar y habilitar Apache
+      ansible.builtin.systemd:
+        name: apache2
+        state: started
+        enabled: true

@@ -1,0 +1,23 @@
+---
+- name: Crear Instancias EC2 en AWS
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Crear una instancia EC2
+      amazon.aws.ec2:
+        key_name: your_key_pair 
+        instance_type: t2.micro
+        image: ami-0c55b159cbfafe1fe # AMI de ubuntu
+        wait: yes
+        count: 1
+        region: us-east-1 # Región
+        vpc_subnet_id: subnet-12345678 # ID de tu subred VPC
+        assign_public_ip: yes
+        security_group: your_security_group # Grupo de seguridad
+        tags:
+          Name: MyAnsibleInstance # Etiqueta de la instancia
+     register: ec2
+
+   - name: Mostrar información de la instancia
+     debug:
+       var: ec2.instances 

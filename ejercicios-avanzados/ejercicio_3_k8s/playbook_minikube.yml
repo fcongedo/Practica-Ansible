@@ -1,0 +1,72 @@
+---
+- name: Instalar Minikube y Kubernetes
+  hosts: localhost
+  become: no  # No usar privilegios de superusuario en general
+  tasks:
+
+    - name: Instalar dependencias necesarias
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - virtualbox
+        state: present
+        update_cache: yes
+      become: yes  # Usar privilegios de superusuario solo para instalar paquetes
+
+    - name: Descargar e instalar Minikube
+      shell: |
+        curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        chmod +x minikube
+        mv minikube /usr/local/bin/
+      become: yes  # Usar privilegios de superusuario para mover el archivo a /usr/local/bin
+
+    - name: Instalar kubectl
+      shell: |
+        curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.26.0/bin/linux/amd64/kubectl
+        chmod +x kubectl
+        mv kubectl /usr/local/bin/
+      become: yes  # Usar privilegios de superusuario para mover el archivo a /usr/local/bin
+
+    - name: Verificar si Docker está instalado
+      command: docker --version
+      register: docker_installed
+      failed_when: docker_installed.rc != 0
+      changed_when: False
+      become: no
+
+    - name: Intentar iniciar Minikube con el driver VirtualBox
+      shell: |
+        minikube start --driver=virtualbox
+      register: minikube_start
+      ignore_errors: yes
+      become: no
+      when: ansible_virtualization_type != 'docker'
+
+    - name: Intentar iniciar Minikube con el driver Docker si VirtualBox falla
+      shell: |
+        minikube start --driver=docker
+      register: minikube_start_docker
+      failed_when: minikube_start_docker.rc != 0
+      when: minikube_start.rc != 0 and docker_installed.rc == 0
+
+    - name: Verificar el estado de Minikube
+      command: minikube status
+      register: minikube_status
+
+    - name: Mostrar el estado de Minikube
+      debug:
+        msg: "{{ minikube_status.stdout }}"
+
+    - name: Desplegar un pod básico en Kubernetes
+      shell: |
+        kubectl create deployment nginx --image=nginx
+        kubectl expose deployment nginx --type=NodePort --port=80
+        kubectl get all
+      become: no
+      when: minikube_status.stdout | regex_search('Running')
+
+    - name: Mostrar el estado del despliegue
+      debug:
+        msg: "El pod de nginx ha sido desplegado y expuesto como servicio en el clúster."

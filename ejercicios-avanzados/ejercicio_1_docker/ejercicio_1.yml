@@ -1,0 +1,52 @@
+---
+- name: Desplegar una aplicación en Docker usando Ansible
+  hosts: vm_prueba
+  become: yes
+  tasks:
+
+    - name: Actualizar la lista de paquetes
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Verificar si Docker está instalado
+      ansible.builtin.command: docker --version
+      register: docker_installed
+      ignore_errors: yes
+
+    - name: Asegurar que Docker esté instalado
+      ansible.builtin.apt:
+        name: docker.io
+        state: latest
+      when: docker_installed.rc != 0  # Solo instala si no está instalado
+
+    - name: Iniciar el servicio de Docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Descargar la imagen de Nginx desde Docker Hub
+      community.general.docker_image:
+        name: nginx
+        source: pull
+
+    - name: Crear el directorio para la aplicación en el nodo remoto
+      ansible.builtin.file:
+        path: /var/www/mi_aplicacion
+        state: directory
+        mode: '0755'
+
+    - name: Copiar archivo index.html desde la máquina local al nodo remoto
+      ansible.builtin.copy:
+        src: /home/fran/practica-ansible/ejercicios-avanzados/ejercicio_1_docker/aplicacion/index.html
+        dest: /var/www/mi_aplicacion/index.html
+
+    - name: Crear y iniciar el contenedor de Nginx
+      community.general.docker_container:
+        name: mi_aplicacion_nginx
+        image: nginx
+        state: started
+        ports:
+          - "8080:80"
+        volumes:
+          - /var/www/mi_aplicacion:/usr/share/nginx/html

@@ -1,0 +1,8 @@
+---
+- name: Usar filtro personalizado para convertir nombres de nodos a mayúsculas
+  hosts: vm_prueba
+  gather_facts: no
+  tasks:
+    - name: Mostrar nombre del nodo en mayúsculas
+      debug:
+        msg: "{{ inventory_hostname | to_uppercase }}"

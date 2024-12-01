@@ -1,0 +1,64 @@
+---
+- name: Automatización de generación e instalación de certificados SSL
+  hosts: vm_prueba
+  become: yes
+  tasks:
+
+    - name: Instalar Apache2 si no está instalado
+      ansible.builtin.package:
+        name: apache2
+        state: present
+
+    - name: Instalar OpenSSL si no está instalado
+      ansible.builtin.package:
+        name: openssl
+        state: present
+
+    - name: Crear directorio para los certificados
+      ansible.builtin.file:
+        path: /etc/apache2/ssl
+        state: directory
+        mode: '0755'
+
+    - name: Generar clave privada SSL
+      ansible.builtin.command:
+        cmd: "openssl genrsa -out /etc/apache2/ssl/certificado.key 2048"
+      args:
+        creates: /etc/apache2/ssl/certificado.key
+
+    - name: Generar certificado SSL autofirmado
+      ansible.builtin.command:
+        cmd: "openssl req -new -x509 -key /etc/apache2/ssl/certificado.key -out /etc/apache2/ssl/certificado.crt -days 365 -subj '/CN=localhost'"
+      args:
+        creates: /etc/apache2/ssl/certificado.crt
+
+    - name: Configurar Apache para usar el certificado SSL
+      ansible.builtin.blockinfile:
+        path: /etc/apache2/sites-available/default-ssl.conf
+        block: |
+          <VirtualHost *:443>
+              ServerAdmin admin@localhost
+              DocumentRoot /var/www/html
+              ServerName localhost
+              SSLEngine on
+              SSLCertificateFile /etc/apache2/ssl/certificado.crt
+              SSLCertificateKeyFile /etc/apache2/ssl/certificado.key
+          </VirtualHost>
+      notify:
+        - Recargar Apache
+
+    - name: Habilitar el sitio SSL en Apache
+      ansible.builtin.command:
+        cmd: a2ensite default-ssl.conf
+
+    - name: Habilitar el módulo SSL en Apache
+      ansible.builtin.command:
+        cmd: a2enmod ssl
+      notify:
+        - Recargar Apache
+
+  handlers:
+    - name: Recargar Apache
+      ansible.builtin.service:
+        name: apache2
+        state: reloaded

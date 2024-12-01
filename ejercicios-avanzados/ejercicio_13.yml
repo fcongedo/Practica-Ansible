@@ -1,0 +1,21 @@
+---
+- name: Instalar paquetes según el entorno
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Instalar paquetes en entorno de desarrollo
+      apt:
+        name:
+          - git
+          - vim
+        state: present
+      when: "'dev' in group_names"
+
+    - name: Instalar paquetes en entorno de producción
+      apt:
+        name:
+          - nginx
+          - ufw
+        state: present
+      when: "'prod' in group_names"

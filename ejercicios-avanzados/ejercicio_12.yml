@@ -1,0 +1,28 @@
+---
+- hosts: vm_prueba
+  become: true
+  tasks:
+    - name: Instalar paquete lvm2 en Ubuntu
+      apt:
+        name: lvm2
+        state: present
+        update_cache: yes
+
+    - name: Crear volumen físico (PV) en /dev/sdb1
+      command: pvcreate /dev/sdb1
+
+    - name: Crear grupo de volúmenes (VG)
+      command: vgcreate vg_data /dev/sdb1
+
+    - name: Crear volumen lógico (LV)
+      command: lvcreate -L 5G -n lv_data vg_data
+
+    - name: Formatear el sistema de archivos
+      command: mkfs.ext4 /dev/vg_data/lv_data
+
+    - name: Montar el volumen lógico
+      mount:
+        path: /mnt/lvm_data
+        src: /dev/vg_data/lv_data
+        fstype: ext4
+        state: mounted

@@ -1,0 +1,42 @@
+---
+- name: Configurar balanceador de carga Nginx en servidor único
+  hosts: vm_prueba
+  become: yes
+
+  tasks:
+    - name: Instalar Nginx
+      ansible.builtin.package:
+        name: nginx
+        state: present
+
+    - name: Crear archivo de configuración de Nginx para el balanceador de carga
+      ansible.builtin.template:
+        src: templates/nginx_lb.conf.j2
+        dest: /etc/nginx/conf.d/load_balancer.conf
+        mode: '0644'
+
+    - name: Eliminar archivo de configuración predeterminada de Nginx en sites-enabled
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Eliminar archivo de configuración predeterminada de Nginx en sites-available
+      ansible.builtin.file:
+        path: /etc/nginx/sites-available/default
+        state: absent
+
+    - name: Eliminar archivo de configuración predeterminada de Nginx en conf.d
+      ansible.builtin.file:
+        path: /etc/nginx/conf.d/default.conf
+        state: absent
+
+    - name: Habilitar y arrancar Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Recargar Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded

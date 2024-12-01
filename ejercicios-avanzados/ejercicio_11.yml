@@ -1,0 +1,14 @@
+- name: Configuración de Cisco Router
+  hosts: cisco_routers
+  gather_facts: no
+  tasks:
+    - name: Configurar la interfaz GigabitEthernet0/1
+      ios_config:
+        lines:
+          - description Enlace a la Red Principal
+          - ip address 192.168.10.1 255.255.255.0
+        parents: interface GigabitEthernet0/1
+
+    - name: Guardar configuración en el dispositivo Cisco
+      ios_config:
+        save_when: modified
